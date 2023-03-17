@@ -1,0 +1,35 @@
+{
+  "name": "text-3d",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "A lite weight library created for drawing text which is consist of multiple points in WebGL.",
+  "author": "Chengjie Huang <chengjie_huang@qq.com>",
+  "license": "MIT",
+  "keywords": [
+    "text3d"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "lint": "eslint . --fix"
+  },
+  "dependencies": {
+    "fp-ts": "^2.13.1",
+    "gl-matrix": "^3.4.3",
+    "lodash": "^4.17.21",
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.36.0",
+    "@types/lodash": "^4.14.187",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "eslint": "^8.36.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.2.0",
+    "vite-plugin-glsl": "^1.1.2",
+    "vitest": "^0.29.3",
+    "vue-tsc": "^1.0.9"
+  }
+}
