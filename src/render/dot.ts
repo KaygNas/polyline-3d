@@ -9,7 +9,7 @@ export class Dot {
   private _value: DotValue
   get x() { return this._value[0] }
   get y() { return this._value[1] }
-  get force() { return this._value[2] }
+  get size() { return this._value[2] }
 
   constructor(...value: DotValue) {
     assert(
