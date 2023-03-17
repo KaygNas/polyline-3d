@@ -1,5 +1,5 @@
-import { assert } from './assert'
-type DotValue = [number, number, number]
+import { assert } from '../core/assert'
+type DotValue = number[]
 
 export class Dot {
   static fromValue(value: DotValue) {
@@ -12,7 +12,10 @@ export class Dot {
   get force() { return this._value[2] }
 
   constructor(...value: DotValue) {
-    assert(value.length === 3, 'Dot must construct with three components: x, y, force.')
+    assert(
+      value.length >= 3,
+      `Dot must construct with three components: x, y, force, but got value: ${value}.`,
+    )
     this._value = value
   }
 
