@@ -5,6 +5,9 @@ import type { Polyline2D, Polyline3D } from '../core'
 import { catmullRomInterpolate, offsetLine, splitToAdjacentPairs } from '../core'
 import type { Dot } from './dot'
 import type { MeshModel } from './interface'
+
+interface Polyline3DMeshBuilderOptions { smooth: boolean; interpolationCount: number}
+
 /**
  * A builder for ployline in 3D.
  * It accepts a batch of dots and link dots to line, offset the line according to the size of dots, we will receive two lines. The two lines could easily form a 2D shape as if a line with changing width.
@@ -17,9 +20,21 @@ import type { MeshModel } from './interface'
  * TriangleA (i0, i1, i1+1) and TriangleB (i0, i1+1, i0+1), together make a rectangle, repeat it on each two lines then it would be done.
  */
 export class Polyline3DMeshBuilder {
-  constructor(private dots: Dot[], private options: { smooth: boolean; interpolationCount: number }) {}
-  build() {
-    const { dots, options } = this
+  constructor(
+    private dots: Dot[] = [],
+    private options: Polyline3DMeshBuilderOptions = { smooth: true, interpolationCount: 10 },
+  ) {}
+
+  setOptions(options: Polyline3DMeshBuilderOptions) {
+    Object.assign(this.options, options)
+  }
+
+  setDots(dots: Dot[]) {
+    this.dots = dots
+  }
+
+  build(dots: Dot[] = this.dots) {
+    const { options } = this
     return pipe(
       dots,
       makePolylines3D,
@@ -35,7 +50,7 @@ function makePolylines3D(dots: Dot[]): Polyline3D[] {
   const closed = equals(head(line), last(line))
   const positiveOffset = dots.map(d => d.size)
   const negativeOffset = dots.map(d => -d.size)
-  const depthOffset = pipe(negativeOffset, map(v => v * 3))
+  const depthOffset = dots.map(dot => -Math.abs(dot.depth))
   const zeroOffset = dots.map(_ => 0)
   const _line1 = offsetLine(line, { offset: positiveOffset, closed })
   const _line2 = offsetLine(line, { offset: negativeOffset, closed })
