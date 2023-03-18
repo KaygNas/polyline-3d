@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Polyline3DMeshBuilder } from '../src/render/polyline-3d-mesh-builder'
-import { Dot } from '../src/render/dot'
-import { Polyline3DMeshRenderer } from '../src/render/polyline-3d-mesh-renderer'
+import { Dot, Polyline3DMeshBuilder, Polyline3DMeshRenderer } from '../src'
 
 const dots = [
   // the outline of number 1
@@ -22,11 +20,10 @@ const dots = [
 
 const canvasEle = ref<HTMLCanvasElement>()
 const main = async (canvasEle: HTMLCanvasElement) => {
-  const builder = new Polyline3DMeshBuilder(dots, { smooth: false, interpolationCount: 20 })
+  const builder = new Polyline3DMeshBuilder(dots, { smooth: true, interpolationCount: 20 })
   const renderer = new Polyline3DMeshRenderer(canvasEle)
   renderer.addMesh(builder.build())
   renderer.render()
-  console.log('renderer=', renderer)
 }
 
 onMounted(() => {
