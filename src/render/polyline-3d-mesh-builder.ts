@@ -4,6 +4,7 @@ import { equals, head, last, map, range } from 'lodash/fp'
 import type { Polyline2D, Polyline3D } from '../core'
 import { catmullRomInterpolate, offsetLine } from '../core'
 import type { Dot } from './dot'
+import type { MeshModel } from './interface'
 /**
  * A builder for ployline in 3D.
  * It accepts a batch of dots and link dots to line, offset the line according to the size of dots, we will receive two lines. The two lines could easily form a 2D shape as if a line with changing width.
@@ -15,8 +16,17 @@ import type { Dot } from './dot'
  *   i0 -- i1
  * TriangleA (i0, i1, i1+1) and TriangleB (i0, i1+1, i0+1), together make a rectangle, repeat it on each two lines then it would be done.
  */
-export function buildPolyline3DMesh(dots: Dot[]) {
-  return pipe(dots, makePolyline3D, map(smoothLine), makeMesh)
+export class Polyline3DMeshBuilder {
+  constructor(private dots: Dot[], private options: { smooth: boolean }) {}
+  build() {
+    const { dots, options } = this
+    return pipe(
+      dots,
+      makePolyline3D,
+      options.smooth ? map(smoothLine) : identity,
+      makeMeshModel,
+    )
+  }
 }
 
 function makePolyline3D(dots: Dot[]): Polyline3D[] {
@@ -47,15 +57,17 @@ function smoothLine(line: Polyline3D): Polyline3D {
   )
 }
 
-function makeMesh(polylines: Polyline3D[]) {
+function makeMeshModel(polylines: Polyline3D[]): MeshModel {
   const indices = makeIndices(polylines)
-  const vertices = makeVertices(polylines)
-  const colors = makeColors(vertices.length)
-  const normals = makeNormals(vertices.length)
-  return { indices, vertices, colors, normals }
+  const positions = makeVertexPositions(polylines)
+  const colors = makeVertexColors(positions.length / 4)
+  const normals = makeVertexNormals(positions.length / 4)
+  return { indices, positions, colors, normals }
 }
-function makeVertices(polylines: Polyline3D[]) {
-  const _vertices = polylines.concat(polylines[0]).flatMap(identity).flatMap(v => Array.from(v.values()))
+function makeVertexPositions(polylines: Polyline3D[]) {
+  const _vertices = polylines.concat(polylines[0])
+    .flatMap(identity)
+    .flatMap(v => [...Array.from(v.values()), 1.0])
   const vertices = new Float32Array(_vertices)
   return vertices
 }
@@ -67,16 +79,16 @@ function makeIndices(polylines: Polyline3D[]) {
   const _indices = range(0, lineCount)
     .flatMap((_, lineIndex) => range(0, pointPerLine - 1).map((_, i) => [i + lineIndex * pointPerLine, pointPerLine]))
     .flatMap(([i, offset]) => indicesParternOf(i, offset))
-  const indices = new Uint8Array(_indices)
+  const indices = new Uint16Array(_indices)
   return indices
 }
-function makeColors(length: number) {
-  const _colors = new Array<number[]>(length).fill([0.0, 0.0, 1.0]).flatMap(identity)
+function makeVertexColors(length: number) {
+  const _colors = new Array<number[]>(length).fill([0.0, 0.0, 1.0, 1.0]).flatMap(identity)
   const colors = new Float32Array(_colors)
   return colors
 }
-function makeNormals(length: number) {
-  const _normals = new Array<number[]>(length).fill([0.0, 0.0, 1.0]).flatMap(identity)
+function makeVertexNormals(length: number) {
+  const _normals = new Array<number[]>(length).fill([0.0, 0.0, 1.0, 1.0]).flatMap(identity)
   const normals = new Float32Array(_normals)
   return normals
 }

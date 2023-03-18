@@ -1,5 +1,5 @@
 import { assert } from '../core/assert'
-type DotValue = number[]
+import type { DotValue } from './interface'
 
 export class Dot {
   static fromValue(value: DotValue) {

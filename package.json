@@ -16,6 +16,7 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "beam-gl": "^0.2211.0",
     "fp-ts": "^2.13.1",
     "gl-matrix": "^3.4.3",
     "lodash": "^4.17.21",

@@ -4,6 +4,7 @@ specifiers:
   '@antfu/eslint-config': ^0.36.0
   '@types/lodash': ^4.14.187
   '@vitejs/plugin-vue': ^4.1.0
+  beam-gl: ^0.2211.0
   eslint: ^8.36.0
   fp-ts: ^2.13.1
   gl-matrix: ^3.4.3
@@ -16,6 +17,7 @@ specifiers:
   vue-tsc: ^1.0.9
 
 dependencies:
+  beam-gl: 0.2211.0
   fp-ts: 2.13.1
   gl-matrix: 3.4.3
   lodash: 4.17.21
@@ -912,6 +914,10 @@ packages:
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: true
+
+  /beam-gl/0.2211.0:
+    resolution: {integrity: sha512-OFwap1TZABpjSSCzJnDtWBIsBWL30gq7am/4TPLL2yZOniVcqpE6NcdgdBt3lUmOH5NtYHAQzNmyzu4w7jsfuA==}
+    dev: false
 
   /boolbase/1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
