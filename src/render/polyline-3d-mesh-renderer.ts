@@ -8,19 +8,18 @@ import type { MeshModel } from './interface'
 export class Polyline3DMeshRenderer {
   private beam: Beam
   private shader: Shader
-
-  private viewMat = mat4.create()
-  private eye = vec3.fromValues(-3, 3, 7)
-  private center = vec3.fromValues(0.0, 0.0, 0.0)
-  private up = vec3.fromValues(0.0, 1.0, 0.0)
-  private modelMat = mat4.create()
-  private projMat = mat4.ortho(mat4.create(), -10, 10, -10, 10, -100, 100)
-
-  private lightColor = vec3.fromValues(1.0, 0.0, 0.0)
-  private lightPosition = vec3.fromValues(0.0, 0.0, 20.0)
-  private ambientLight = vec3.fromValues(0.0, 0.0, 0.4)
-
   private meshs = new Set<MeshModel>()
+
+  viewMat = mat4.create()
+  eye = vec3.fromValues(-3, 3, 7)
+  center = vec3.fromValues(0.0, 0.0, 0.0)
+  up = vec3.fromValues(0.0, 1.0, 0.0)
+  modelMat = mat4.create()
+  projMat = mat4.ortho(mat4.create(), -10, 10, -10, 10, -100, 100)
+
+  lightColor = vec3.fromValues(1.0, 1.0, 1.0)
+  lightPosition = vec3.fromValues(0.0, 0.0, 20.0)
+  ambientLight = vec3.fromValues(0.4, 0.4, 0.4)
 
   constructor(canvasElement: HTMLCanvasElement) {
     this.beam = new Beam(canvasElement)
@@ -43,7 +42,6 @@ export class Polyline3DMeshRenderer {
     })
     const gl = this.beam.gl
     gl.enable(gl.DEPTH_TEST)
-    this.enableRotationControl()
   }
 
   addMesh(mesh: MeshModel | MeshModel[]) {
@@ -82,30 +80,5 @@ export class Polyline3DMeshRenderer {
         u_ProjMatrix: projMat,
       }),
     )
-  }
-
-  private enableRotationControl() {
-    const onkeydown = (e: KeyboardEvent) => {
-      const { modelMat } = this
-      const tranformMat = mat4.create()
-      switch (e.key) {
-        case 'ArrowLeft':
-          mat4.fromRotation(tranformMat, 0.1, vec3.fromValues(0.0, 1.0, 0.0))
-          break
-        case 'ArrowRight':
-          mat4.fromRotation(tranformMat, -0.1, vec3.fromValues(0.0, 1.0, 0.0))
-          break
-        case 'ArrowUp':
-          mat4.fromRotation(tranformMat, 0.1, vec3.fromValues(1.0, 0.0, 0.0))
-          break
-        case 'ArrowDown':
-          mat4.fromRotation(tranformMat, -0.1, vec3.fromValues(1.0, 0.0, 0.0))
-          break
-        default:
-      }
-      mat4.multiply(modelMat, modelMat, tranformMat)
-      this.render()
-    }
-    window.addEventListener('keydown', onkeydown)
   }
 }
