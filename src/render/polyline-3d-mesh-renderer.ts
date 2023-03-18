@@ -15,12 +15,7 @@ export class Polyline3DMeshRenderer {
   private up = vec3.fromValues(0.0, 1.0, 0.0)
   private modelMat = mat4.create()
   private projMat = mat4.ortho(mat4.create(), -10, 10, -10, 10, 1, 100)
-  private mesh: MeshModel = {
-    indices: new Uint16Array(),
-    positions: new Float32Array(),
-    colors: new Float32Array(),
-    normals: new Float32Array(),
-  }
+  private meshs = new Set<MeshModel>()
 
   constructor(canvasElement: HTMLCanvasElement) {
     this.beam = new Beam(canvasElement)
@@ -46,9 +41,18 @@ export class Polyline3DMeshRenderer {
     this.enableRotationControl()
   }
 
-  render(mesh: MeshModel = this.mesh) {
+  addMesh(mesh: MeshModel | MeshModel[]) {
+    const _meshs = Array.isArray(mesh) ? mesh : [mesh]
+    _meshs.forEach(mesh => this.meshs.add(mesh))
+  }
+
+  render() {
+    this.meshs.forEach(mesh => this.renderMesh(mesh))
+  }
+
+  private renderMesh(mesh: MeshModel) {
     const { viewMat, eye, center, up, modelMat, projMat, beam, shader } = this
-    const { positions, colors, normals, indices } = (this.mesh = mesh)
+    const { positions, colors, normals, indices } = mesh
 
     mat4.lookAt(viewMat, eye, center, up)
     beam.draw(
