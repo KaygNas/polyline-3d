@@ -2,6 +2,7 @@ import type { vec2 } from 'gl-matrix'
 import type { Polyline2D, Segment2D } from './interface'
 import { joinSegments, translateSegment } from './math-2d'
 import { assert } from './assert'
+import { splitToAdjacentPairs } from './utils'
 
 export interface OffsetOptions {
   offset: number | number[]
@@ -17,12 +18,7 @@ export function offsetLine(inputLine: vec2[], options: OffsetOptions) {
 
 // iterate all ponits, for each two points make a short line
 export function splitToSegments(line: Polyline2D) {
-  return line.reduce<Segment2D[]>((segments, point, i) => {
-    const nextPoint = line[i + 1]
-    if (nextPoint)
-      segments.push([point, nextPoint])
-    return segments
-  }, [])
+  return splitToAdjacentPairs(line)
 }
 
 // extends two adjacent lines make sure they intersect at a same point

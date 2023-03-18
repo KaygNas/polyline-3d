@@ -14,7 +14,12 @@ export class Polyline3DMeshRenderer {
   private center = vec3.fromValues(0.0, 0.0, 0.0)
   private up = vec3.fromValues(0.0, 1.0, 0.0)
   private modelMat = mat4.create()
-  private projMat = mat4.ortho(mat4.create(), -10, 10, -10, 10, 1, 100)
+  private projMat = mat4.ortho(mat4.create(), -10, 10, -10, 10, -100, 100)
+
+  private lightColor = vec3.fromValues(1.0, 0.0, 0.0)
+  private lightPosition = vec3.fromValues(0.0, 0.0, 20.0)
+  private ambientLight = vec3.fromValues(0.0, 0.0, 0.4)
+
   private meshs = new Set<MeshModel>()
 
   constructor(canvasElement: HTMLCanvasElement) {
@@ -28,9 +33,9 @@ export class Polyline3DMeshRenderer {
         a_Normal: { type: SchemaTypes.vec4 },
       },
       uniforms: {
-        u_LightColor: { type: SchemaTypes.vec3, default: vec3.fromValues(1, 1, 1) },
-        u_AmbientLight: { type: SchemaTypes.vec3, default: vec3.fromValues(0.6, 0.6, 0.6) },
-        u_LightPosition: { type: SchemaTypes.vec3, default: vec3.fromValues(-3.0, 7.0, 8.0) },
+        u_LightColor: { type: SchemaTypes.vec3, default: this.lightColor },
+        u_AmbientLight: { type: SchemaTypes.vec3, default: this.ambientLight },
+        u_LightPosition: { type: SchemaTypes.vec3, default: this.lightPosition },
         u_ViewMatrix: { type: SchemaTypes.mat4, default: this.viewMat },
         u_ProjMatrix: { type: SchemaTypes.mat4, default: this.projMat },
         u_ModelMatrix: { type: SchemaTypes.mat4, default: this.modelMat },
@@ -51,7 +56,12 @@ export class Polyline3DMeshRenderer {
   }
 
   private renderMesh(mesh: MeshModel) {
-    const { viewMat, eye, center, up, modelMat, projMat, beam, shader } = this
+    const {
+      beam, shader,
+      eye, center, up,
+      viewMat, modelMat, projMat,
+      lightColor, lightPosition, ambientLight,
+    } = this
     const { positions, colors, normals, indices } = mesh
 
     mat4.lookAt(viewMat, eye, center, up)
@@ -64,6 +74,9 @@ export class Polyline3DMeshRenderer {
       }),
       beam.resource(ResourceTypes.IndexBuffer, { array: indices }),
       beam.resource(ResourceTypes.Uniforms, {
+        u_LightColor: lightColor,
+        u_AmbientLight: ambientLight,
+        u_LightPosition: lightPosition,
         u_ModelMatrix: modelMat,
         u_ViewMatrix: viewMat,
         u_ProjMatrix: projMat,

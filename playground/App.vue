@@ -22,9 +22,10 @@ const dots = [
 
 const canvasEle = ref<HTMLCanvasElement>()
 const main = async (canvasEle: HTMLCanvasElement) => {
-  const builder = new Polyline3DMeshBuilder(dots, { smooth: true })
+  const builder = new Polyline3DMeshBuilder(dots, { smooth: false, interpolationCount: 20 })
   const renderer = new Polyline3DMeshRenderer(canvasEle)
-  renderer.render(builder.build())
+  renderer.addMesh(builder.build())
+  renderer.render()
   console.log('renderer=', renderer)
 }
 

@@ -1,8 +1,8 @@
 import { vec2, vec3 } from 'gl-matrix'
 import { identity, pipe } from 'fp-ts/lib/function'
-import { equals, head, last, map, range } from 'lodash/fp'
+import { equals, flatMap, head, last, map, range, sum } from 'lodash/fp'
 import type { Polyline2D, Polyline3D } from '../core'
-import { catmullRomInterpolate, offsetLine } from '../core'
+import { catmullRomInterpolate, offsetLine, splitToAdjacentPairs } from '../core'
 import type { Dot } from './dot'
 import type { MeshModel } from './interface'
 /**
@@ -22,14 +22,15 @@ export class Polyline3DMeshBuilder {
     const { dots, options } = this
     return pipe(
       dots,
-      makePolyline3D,
+      makePolylines3D,
       options.smooth ? map(line => smoothLine(line, options)) : identity,
-      makeMeshModel,
+      groupIntoFourPairs,
+      map(makeMeshModel),
     )
   }
 }
 
-function makePolyline3D(dots: Dot[]): Polyline3D[] {
+function makePolylines3D(dots: Dot[]): Polyline3D[] {
   const line = dots.map(d => vec2.fromValues(d.x, d.y))
   const closed = equals(head(line), last(line))
   const positiveOffset = dots.map(d => d.size)
@@ -57,15 +58,25 @@ function smoothLine(line: Polyline3D, options: { interpolationCount: number } = 
   )
 }
 
-function makeMeshModel(polylines: Polyline3D[]): MeshModel {
-  const indices = makeIndices(polylines)
-  const positions = makeVertexPositions(polylines)
-  const colors = makeVertexColors(positions.length / 4)
-  const normals = makeVertexNormals(positions.length / 4)
+type Polyline3DPair = [Polyline3D, Polyline3D]
+function groupIntoFourPairs(polylines: Polyline3D[]) {
+  return polylines.reduce<Polyline3DPair[]>((pairs, line, i) => {
+    const nextLine = polylines[(i + 1) % polylines.length]
+    const pair: Polyline3DPair = [line, nextLine]
+    pairs.push(pair)
+    return pairs
+  }, [])
+}
+
+function makeMeshModel(pair: Polyline3DPair): MeshModel {
+  const indices = makeIndices(pair)
+  const positions = makeVertexPositions(pair)
+  const colors = makeVertexColors(pair)
+  const normals = makeVertexNormals(pair)
   return { indices, positions, colors, normals }
 }
 function makeVertexPositions(polylines: Polyline3D[]) {
-  const _vertices = polylines.concat(polylines[0])
+  const _vertices = polylines
     .flatMap(identity)
     .flatMap(v => [...Array.from(v.values()), 1.0])
   const vertices = new Float32Array(_vertices)
@@ -76,19 +87,44 @@ function makeIndices(polylines: Polyline3D[]) {
   const pointPerLine = polylines[0].length
   const indicesParternOf = (i: number, offset: number) => [i, i + offset, i + offset + 1, i, i + offset + 1, i + 1]
 
-  const _indices = range(0, lineCount)
+  const _indices = range(0, lineCount - 1)
     .flatMap((_, lineIndex) => range(0, pointPerLine - 1).map((_, i) => [i + lineIndex * pointPerLine, pointPerLine]))
     .flatMap(([i, offset]) => indicesParternOf(i, offset))
   const indices = new Uint16Array(_indices)
   return indices
 }
-function makeVertexColors(length: number) {
-  const _colors = new Array<number[]>(length).fill([0.0, 0.0, 1.0, 1.0]).flatMap(identity)
+function makeVertexColors(pair: Polyline3DPair) {
+  const length = pipe(pair, map(l => l.length), sum)
+  const _colors = new Array<number[]>(length).fill([1.0, 1.0, 1.0, 1.0]).flatMap(identity)
   const colors = new Float32Array(_colors)
   return colors
 }
-function makeVertexNormals(length: number) {
-  const _normals = new Array<number[]>(length).fill([0.0, 0.0, 1.0, 1.0]).flatMap(identity)
-  const normals = new Float32Array(_normals)
+function makeVertexNormals(pair: Polyline3DPair) {
+  const normalsOfRectangles = pipe(
+    pair,
+    makeSegmentPairs,
+    map(normalOfSegmentPair),
+    map(n => [...Array.from(n), 1.0]),
+    arr => [...arr, last(arr)!],
+    arr => [...arr, ...arr],
+    flatMap(identity),
+  )
+  const normals = new Float32Array(normalsOfRectangles)
   return normals
+}
+type Segment = [vec3, vec3]
+type SegmentPair = [Segment, Segment]
+function normalOfSegmentPair(segmentPair: SegmentPair) {
+  const segment1 = [segmentPair[0][0], segmentPair[1][1]]
+  const segment2 = [segmentPair[0][1], segmentPair[1][0]]
+  return pipe(
+    [segment1, segment2],
+    map(([a, b]) => vec3.subtract(vec3.create(), a, b)),
+    ([v1, v2]) => vec3.cross(vec3.create(), v2, v1),
+    v => vec3.normalize(vec3.create(), v),
+  )
+}
+function makeSegmentPairs(linePair: Polyline3DPair) {
+  const [line1, line2] = linePair.map(splitToAdjacentPairs)
+  return line1.map((_, i) => [line1[i], line2[i]] as SegmentPair)
 }
