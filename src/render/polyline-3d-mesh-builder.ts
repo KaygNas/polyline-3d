@@ -17,13 +17,13 @@ import type { MeshModel } from './interface'
  * TriangleA (i0, i1, i1+1) and TriangleB (i0, i1+1, i0+1), together make a rectangle, repeat it on each two lines then it would be done.
  */
 export class Polyline3DMeshBuilder {
-  constructor(private dots: Dot[], private options: { smooth: boolean }) {}
+  constructor(private dots: Dot[], private options: { smooth: boolean; interpolationCount: number }) {}
   build() {
     const { dots, options } = this
     return pipe(
       dots,
       makePolyline3D,
-      options.smooth ? map(smoothLine) : identity,
+      options.smooth ? map(line => smoothLine(line, options)) : identity,
       makeMeshModel,
     )
   }
@@ -48,11 +48,11 @@ function polyline3DFrom2D(line: Polyline2D, z: number[]): Polyline3D {
   return line.map((v, i) => vec3.fromValues(v[0], v[1], z[i]))
 }
 
-function smoothLine(line: Polyline3D): Polyline3D {
+function smoothLine(line: Polyline3D, options: { interpolationCount: number } = { interpolationCount: 3 }): Polyline3D {
   return pipe(
     line,
     map(v => Array.from(v.values())),
-    v => catmullRomInterpolate(v, { componentCount: 3, interpolationCount: 3 }),
+    v => catmullRomInterpolate(v, { ...options, componentCount: 3 }),
     map(v => vec3.fromValues(v[0], v[1], v[2])),
   )
 }
