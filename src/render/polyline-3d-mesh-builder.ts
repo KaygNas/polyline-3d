@@ -25,7 +25,7 @@ export class Polyline3DMeshBuilder {
     private options: Polyline3DMeshBuilderOptions = { smooth: true, interpolationCount: 10 },
   ) {}
 
-  setOptions(options: Polyline3DMeshBuilderOptions) {
+  setOptions(options: Partial<Polyline3DMeshBuilderOptions>) {
     Object.assign(this.options, options)
   }
 
