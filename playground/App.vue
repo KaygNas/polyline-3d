@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { mat4, vec3 } from 'gl-matrix'
-import { Dot, Polyline3DMeshBuilder, Polyline3DMeshRenderer } from '../src'
+import { Dot, MouseTracker, Polyline3DMeshBuilder, Polyline3DMeshRenderer } from '../src'
 
 const dots = [
   // the outline of number 1
@@ -23,35 +23,27 @@ const canvasEle = ref<HTMLCanvasElement>()
 function main(canvasEle: HTMLCanvasElement) {
   const builder = new Polyline3DMeshBuilder(dots, { smooth: true, interpolationCount: 20 })
   const renderer = new Polyline3DMeshRenderer(canvasEle)
+  const controler = new MouseTracker({
+    traget: canvasEle,
+    onTrack: (e) => {
+      const sensitivity = 0.02
+      const rotation = { x: e.movementY * sensitivity, y: e.movementX * sensitivity }
+      const rotateMat = mat4.create()
+      mat4.rotateX(rotateMat, rotateMat, rotation.x)
+      mat4.rotateY(rotateMat, rotateMat, rotation.y)
+      mat4.multiply(renderer.modelMat, rotateMat, renderer.modelMat)
+      renderer.render()
+    },
+  })
   renderer.lightColor = vec3.fromValues(1.0, 0.0, 0.0)
   renderer.ambientLight = vec3.fromValues(0.0, 0.0, 0.4)
   renderer.addMesh(builder.build())
   renderer.render()
-  enableRotationControl(renderer)
-}
-function enableRotationControl(renderer: Polyline3DMeshRenderer) {
-  const onkeydown = (e: KeyboardEvent) => {
-    const { modelMat } = renderer
-    const tranformMat = mat4.create()
-    switch (e.key) {
-      case 'ArrowLeft':
-        mat4.fromRotation(tranformMat, 0.1, vec3.fromValues(0.0, 1.0, 0.0))
-        break
-      case 'ArrowRight':
-        mat4.fromRotation(tranformMat, -0.1, vec3.fromValues(0.0, 1.0, 0.0))
-        break
-      case 'ArrowUp':
-        mat4.fromRotation(tranformMat, 0.1, vec3.fromValues(1.0, 0.0, 0.0))
-        break
-      case 'ArrowDown':
-        mat4.fromRotation(tranformMat, -0.1, vec3.fromValues(1.0, 0.0, 0.0))
-        break
-      default:
-    }
-    mat4.multiply(modelMat, modelMat, tranformMat)
-    renderer.render()
-  }
-  window.addEventListener('keydown', onkeydown)
+  controler.enbale()
+
+  onUnmounted(() => {
+    controler.disable()
+  })
 }
 
 onMounted(() => {
