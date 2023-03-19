@@ -34,6 +34,9 @@ export class Polyline3DMeshBuilder {
   }
 
   build(dots: Dot[] = this.dots) {
+    if (dots.length < 2)
+      return []
+
     const { options } = this
     return pipe(
       dots,
