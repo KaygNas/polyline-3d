@@ -44,13 +44,15 @@ export class Polyline3DMeshRenderer {
     gl.enable(gl.DEPTH_TEST)
   }
 
-  addMesh(mesh: MeshModel | MeshModel[]) {
-    const _meshs = Array.isArray(mesh) ? mesh : [mesh]
-    _meshs.forEach(mesh => this.meshs.add(mesh))
+  setMeshs(meshs: MeshModel[]) {
+    this.meshs = new Set(meshs)
   }
 
   render() {
-    this.meshs.forEach(mesh => this.renderMesh(mesh))
+    if (this.meshs.size === 0)
+      this.beam.clear()
+    else
+      this.meshs.forEach(mesh => this.renderMesh(mesh))
   }
 
   private renderMesh(mesh: MeshModel) {
