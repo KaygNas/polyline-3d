@@ -19,13 +19,14 @@ const dots = ref([
   [0.3, 0.1, 0.02, 0.02 * 5],
   [0.3, 0.0, 0.03, 0.03 * 5],
 ].map(Dot.fromValue)) as Ref<Dot[]>
+const smooth = ref(true)
 
 const canvasEle = ref<HTMLCanvasElement>()
 let builder: Polyline3DMeshBuilder
 let renderer: Polyline3DMeshRenderer
 let controler: MouseTracker
 function main(canvasEle: HTMLCanvasElement) {
-  builder = new Polyline3DMeshBuilder(dots.value, { smooth: true, interpolationCount: 20 })
+  builder = new Polyline3DMeshBuilder(dots.value, { smooth: smooth.value, interpolationCount: 20 })
   renderer = new Polyline3DMeshRenderer(canvasEle)
   controler = new MouseTracker({
     traget: canvasEle,
@@ -47,6 +48,12 @@ function main(canvasEle: HTMLCanvasElement) {
   controler.enbale()
 }
 
+function onSmoothChange(v: boolean) {
+  smooth.value = v
+  builder.setOptions({ smooth: v })
+  renderer.setMeshs(builder.build())
+  renderer.render()
+}
 function onResetRotation() {
   renderer.eye = vec3.fromValues(0, 0, 1)
   renderer.modelMat = mat4.create()
@@ -68,7 +75,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Board :dots="dots" :width="800" :height="800" @reset-rotation="onResetRotation" @change="onChange">
+  <Board
+    :dots="dots" :width="800" :height="800" :smooth="smooth"
+    @smooth-change="onSmoothChange"
+    @reset-rotation="onResetRotation"
+    @change="onChange"
+  >
     <canvas ref="canvasEle" :width="800" :height="800" />
   </Board>
 </template>

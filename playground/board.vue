@@ -1,10 +1,11 @@
 <script lang='ts' setup>
-import { nextTick, ref } from 'vue'
+import { ref } from 'vue'
 import { last } from 'lodash/fp'
 import { Dot } from '../src'
 import BoradDot from './borad-dot.vue'
-const props = defineProps<{ dots: Dot[]; width: number; height: number }>()
+const props = defineProps<{ dots: Dot[]; width: number; height: number; smooth: boolean }>()
 const emit = defineEmits<{
+  (e: 'smoothChange', v: boolean): void
   (e: 'resetRotation'): void
   (e: 'change', v: Dot[]): void
 }>()
@@ -49,18 +50,21 @@ function onChange(index: number, dot: Dot) {
     <slot />
 
     <div class="operation-bar">
+      <button @click="emit('smoothChange', !smooth)">
+        Smooth {{ smooth ? 'On' : 'Off' }}
+      </button>
       <button @click="emit('resetRotation')">
-        reset rotation
+        Reset Rotation
       </button>
 
       <button @click="toggleBoardVisible">
-        {{ boardVisible ? 'save' : 'edit' }}
+        {{ boardVisible ? 'Save' : 'Edit' }}
       </button>
       <button v-if="boardVisible" @click="newDot">
-        new dot
+        New Dot
       </button>
       <button v-if="boardVisible" @click="clearDots">
-        clear
+        Clear
       </button>
     </div>
 
