@@ -1,8 +1,8 @@
 {
-  "name": "text-3d",
+  "name": "polyline-3d",
   "type": "module",
   "version": "0.0.0",
-  "description": "A lite weight library created for drawing text which is consist of multiple points in WebGL.",
+  "description": "A lite weight library created for drawing polyline which is consist of multiple points in WebGL.",
   "author": "Chengjie Huang <chengjie_huang@qq.com>",
   "license": "MIT",
   "keywords": [
