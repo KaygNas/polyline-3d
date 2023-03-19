@@ -62,7 +62,8 @@ function onResetRotation() {
 
 function onChange(v: Dot[]) {
   dots.value = v
-  renderer.setMeshs(builder.build(dots.value))
+  builder.setDots(v)
+  renderer.setMeshs(builder.build())
   renderer.render()
 }
 
