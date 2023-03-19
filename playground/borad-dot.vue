@@ -89,10 +89,12 @@ onUnmounted(() => {
   height: 100%;
   padding: 0;
   border-radius: 50%;
-  background-color: #ffffff2f;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background-color: #ffffff2f;
+  box-shadow: 0 0 0 calc(v-bind(dot.depth) * 20px) #ffffffaf;
 }
 .board-dot:active {
   color:#000;
