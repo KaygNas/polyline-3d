@@ -11,14 +11,14 @@ export class Polyline3DMeshRenderer {
   private meshs = new Set<MeshModel>()
 
   viewMat = mat4.create()
-  eye = vec3.fromValues(-3, 3, 7)
+  eye = vec3.fromValues(0, 0, 1)
   center = vec3.fromValues(0.0, 0.0, 0.0)
   up = vec3.fromValues(0.0, 1.0, 0.0)
   modelMat = mat4.create()
-  projMat = mat4.ortho(mat4.create(), -10, 10, -10, 10, -100, 100)
+  projMat = mat4.ortho(mat4.create(), -1, 1, -1, 1, 0, 2)
 
   lightColor = vec3.fromValues(1.0, 1.0, 1.0)
-  lightPosition = vec3.fromValues(0.0, 0.0, 20.0)
+  lightPosition = vec3.fromValues(0.0, 0.0, 1.0)
   ambientLight = vec3.fromValues(0.4, 0.4, 0.4)
 
   constructor(canvasElement: HTMLCanvasElement) {
