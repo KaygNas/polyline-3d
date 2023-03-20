@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build App
-        run: pnpm build
+        run: pnpm playground:build
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:

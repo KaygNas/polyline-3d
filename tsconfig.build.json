@@ -6,32 +6,20 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
     "lib": [
       "ESNext",
       "DOM"
     ],
+    "outDir": "lib",
     "skipLibCheck": true,
-    "noEmit": true
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "include": [
-    "__tests__/**/*.ts",
-    "playground/**/*.ts",
-    "playground/**/*.d.ts",
-    "playground/**/*.tsx",
-    "playground/**/*.vue",
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
     "vite-env.d.ts"
   ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
 }
