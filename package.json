@@ -1,7 +1,7 @@
 {
   "name": "kaygnas-polyline-3d",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A lite weight library created for drawing polyline which is consist of multiple points in WebGL.",
   "author": "Chengjie Huang <chengjie_huang@qq.com>",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "build": "pnpm lib:build",
     "playground:build": "vue-tsc && vite build",
     "lib:build": "rimraf lib && tsc --project tsconfig.build.json && rollup -c",
-    "lib:publish": "pnpm test --run && pnpm build && npm publish --registry=https://registry.npmjs.org/",
+    "lib:publish": "vitest --run && pnpm build && npm publish --registry=https://registry.npmjs.org/",
     "test": "vitest",
     "lint": "eslint . --fix"
   },
