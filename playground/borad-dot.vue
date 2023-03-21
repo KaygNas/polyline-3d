@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Dot, MouseTracker } from '../src'
 
+
 const props = defineProps<{
   index: number
   dot: Dot

@@ -4,21 +4,10 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { mat4, vec3 } from 'gl-matrix'
 import { Dot, MouseTracker, Polyline3DMeshBuilder, Polyline3DMeshRenderer } from '../src'
 import Board from './board.vue'
+import dotsOfHao from './dots-hao.json'
 
-const dots = ref([
-  // the outline of number 1
-  [0.0, 0.0, 0.01, 0.01 * 5],
-  [0.0, 0.1, 0.02, 0.02 * 5],
-  [0.1, 0.1, 0.03, 0.03 * 5],
-  [0.1, 0.6, 0.04, 0.04 * 5],
-  [0.0, 0.6, 0.05, 0.05 * 5],
-  [0.0, 0.7, 0.04, 0.04 * 5],
-  [0.1, 0.8, 0.03, 0.03 * 5],
-  [0.2, 0.8, 0.02, 0.02 * 5],
-  [0.2, 0.1, 0.01, 0.01 * 5],
-  [0.3, 0.1, 0.02, 0.02 * 5],
-  [0.3, 0.0, 0.03, 0.03 * 5],
-].map(Dot.fromValue)) as Ref<Dot[]>
+// the outline of "好"
+const dots = ref(dotsOfHao.map(Dot.fromValue)) as Ref<Dot[]>
 const smooth = ref(true)
 
 const canvasEle = ref<HTMLCanvasElement>()
